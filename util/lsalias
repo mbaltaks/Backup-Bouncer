@@ -12,7 +12,7 @@ def usage():
 def resolveAlias(fsspec):
     path = File.ResolveAliasFile(fsspec, True)[0].as_pathname()
     return path
-    
+
 def aliasdest(filename):
     fss = FSSpec(filename)
     (isalias, dummy) = fss.IsAliasFile()

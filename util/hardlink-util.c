@@ -1,4 +1,4 @@
-char *notes = 
+char *notes =
 "   Introduced with Leopard: the ability to do directory hardlinks.  This is\n"
 "   not a supported operation and the link() man page claims it doesn't work,\n"
 "   but Unsanity's Rosyna Keller figured out the following set of conditions\n"

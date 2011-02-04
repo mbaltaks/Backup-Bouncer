@@ -1,0 +1,174 @@
+#!/bin/sh
+# UF_COMPRESSED 0x0020 == (oct)0040 == (dec)0032
+
+max_priority () {
+    echo $Important
+}
+
+create () {
+    set -e
+
+    touch $1/compressed_file
+    xattr-util --set-data com.apple.decmpfs util/cmp_file_lg.com.apple.decmpfs $1/compressed_file
+    xattr-util --set-data com.apple.ResourceFork util/cmp_file_lg.com.apple.ResourceFork $1/compressed_file
+    chflags 0040 $1/compressed_file
+
+    touch $1/compressed_file_src_link
+    xattr-util --set-data com.apple.decmpfs util/cmp_file_lg.com.apple.decmpfs $1/compressed_file_src_link
+    xattr-util --set-data com.apple.ResourceFork util/cmp_file_lg.com.apple.ResourceFork $1/compressed_file_src_link
+    chflags 0040 $1/compressed_file_src_link
+    ln $1/compressed_file_src_link $1/compressed_file_hard_link
+}
+
+# Override subtest because ok/FAIL doesn't really work for these tests
+subtest () {
+    if [ -n "$DETAIL" ]; then
+        printf "   Sub-test: %${printWidth}s ... " "$1"
+        echo "$2"
+    fi
+}
+
+compare_xattr () {
+    test -e $1 && \
+        test -e $2 && \
+        test "`xattr-util --list $1`" = "`xattr-util --list $2`" \
+        || return 1
+    for a in "`xattr-util --list $1`"; do
+        test "`xattr-util --get $a $1`" = "`xattr-util --get $a $2`" || return 1
+    done
+}
+
+compare_flags () {
+    test "`stat -f '%f' $1`" = "32"
+}
+
+compare_contents () {
+    test "`md5 -q $1`" = "7f2cd02b060f83273df98a961e4c69d3"
+}
+
+compare-mtime () {
+    test "`stat -f '%m' $1`" = "`stat -f '%m' $2`"
+}
+
+compare-ctime () {
+    test "`stat -f '%B' $1`" = "`stat -f '%B' $2`"
+}
+
+compare_inodes () {
+    test "`stat -f '%i' $1`" = "`stat -f '%i' $2`"
+}
+
+
+verify () {
+    set +e
+
+    begin-subtests
+
+    compare_xattr $1/compressed_file $2/compressed_file
+    x1=$?
+    if [ $x1 = 0 ]; then
+		message="preserved"
+    else
+		message="not preserved"
+    fi
+    subtest "decmpfs xattr" "$message"
+
+    compare_flags $1/compressed_file $2/compressed_file
+    x2=$?
+    if [ $x2 = 0 ]; then
+		message="set"
+    else
+		message="not set"
+    fi
+    subtest "UF_COMPRESSED flag" "$message"
+
+    os=`sw_vers | awk -F. '/ProductVersion/ {print $2}'`
+
+	pushd $1 > /dev/null
+    if [ $os -lt 6 -a $x1 = 0 -a $x2 = 0 ]; then
+		if [ `stat -f '%z' ./compressed_file` = 0 ]; then
+			message="empty (ok)"
+			x3=0
+		else
+			message="not truncated!"
+			x3=1
+			x2=1
+		fi
+	else
+		compare_contents $1/compressed_file $2/compressed_file
+    	x3=$?
+    	if [ $x3 = 0 ]; then
+			message="match"
+    	else
+			message="do not match"
+    	fi
+	fi
+    subtest "file contents" "$message"
+	popd > /dev/null
+
+    compare-ctime $1/compressed_file $2/compressed_file
+    x4=$?
+    if [ $x4 = 0 ]; then
+		message="ok"
+    else
+		message="FAIL"
+    fi
+    subtest "creation time" "$message"
+
+    compare-mtime $1/compressed_file $2/compressed_file
+    x5=$?
+    if [ $x5 = 0 ]; then
+		message="ok"
+    else
+		message="FAIL"
+    fi
+    subtest "modification time" "$message"
+
+    compare_inodes $2/compressed_file_src_link $2/compressed_file_hard_link
+    x6=$?
+    if [ $x6 = 0 ]; then
+		message="ok"
+    else
+		message="FAIL"
+    fi
+    subtest "hard link inode" "$message"
+
+    compare_xattr $1/compressed_file_hard_link $2/compressed_file_hard_link
+    x7=$?
+    if [ $x7 = 0 ]; then
+		message="preserved"
+    else
+		message="not preserved"
+    fi
+    subtest "hard link decmpfs xattr" "$message"
+
+    compare_flags $1/compressed_file_hard_link $2/compressed_file_hard_link
+    x8=$?
+    if [ $x8 = 0 ]; then
+		message="set"
+    else
+		message="not set"
+    fi
+    subtest "hard link UF_COMPRESSED flag" "$message"
+
+    compare-mtime $1/compressed_file_hard_link $2/compressed_file_hard_link
+    x9=$?
+    if [ $x9 = 0 ]; then
+		message="ok"
+    else
+		message="FAIL"
+    fi
+    subtest "hard link modification time" "$message"
+
+    ## Indicate success if the xattrs and flags match, or if the contents match
+    y=1
+    if [ $x1 = 0 -a $x2 = 0 -o $x3 = 0 ]; then
+	y=0
+    fi
+
+    alltrue $x4 $x5 $6 $7 $8 $9 $y
+}
+
+clean () {
+    true
+}

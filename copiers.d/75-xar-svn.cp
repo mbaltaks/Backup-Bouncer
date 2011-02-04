@@ -11,7 +11,7 @@ can-copy () {
 version () {
     $xar --version
     echo
-    echo "command = 
+    echo "command =
     cd src
     sudo $xar -c -f tmpfile . \
         && cd dst \

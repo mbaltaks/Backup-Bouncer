@@ -12,7 +12,7 @@ if can-copy; then
     echo $copier >> $dst/meta
     echo >> $dst/meta
     version >> $dst/meta
-    
+
     backup $src $dst &> $dst/log
     #backup $src $dst | tee $dst/log
     exit $?

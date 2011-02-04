@@ -42,7 +42,7 @@ You can now run "bbouncer" with no arguments for usage info.  Or, you can run
 the results.  Also take a look in the scripts directory for scripts you can use
 to test tools that can't be run in the normal test suite for whatever reason.
 
-Note that many of the tests and all of the copiers require root priveleges.  
+Note that many of the tests and all of the copiers require root priveleges.
 They run using sudo, so you'll be prompted for your password.  This also means
 you need to run the suite as a member of the admin group.
 
@@ -55,8 +55,8 @@ Limitations
 
 For the moment, Backup Bouncer is focused on validating archival tools used in
 whole-subtree copying mode.  This means that our automated tests don't test how
-well metadata is preserved for single-file copies (in tools that support them). 
-This is an issue, for example, for metadata that are stored in .DS_Store files. 
+well metadata is preserved for single-file copies (in tools that support them).
+This is an issue, for example, for metadata that are stored in .DS_Store files.
 A whole-subtree copy will copy the .DS_Store file along with the directory
 contents, but a single-file copy of a file may not preserve metadata from the
 .DS_Store file.  This is an important problem for incremental backup tools, but
@@ -120,7 +120,7 @@ set out to reproduce maurits' results and run some extra tests of my own.
 
 References
 ==========
-[1] The post that started it all: 
+[1] The post that started it all:
     <http://blog.plasticsfuture.org/2006/03/05/the-state-of-backup-and-cloning-tools-under-mac-os-x/>
 
 [2] A nice, though not 100% accurate site on OS X filesystem metadata.  Includes references!

@@ -7,7 +7,7 @@ max_priority () {
 create () {
     cd $1
     set -e
-    
+
     mkfifo some-fifo
 }
 
@@ -17,7 +17,7 @@ compare () {
 
 verify () {
     cd $1
-    
+
     test -p ./some-fifo \
      && compare ./some-fifo $2/some-fifo
 }

@@ -10,7 +10,7 @@
 #     -m date         # modification date (mm/dd/[yy]yy [hh:mm[:ss] [AM | PM]])*
 #         -P          # perform action on symlink instead of following it
 #     -t type         # file type
-# 
+#
 #     Note: The following attributes may be used with the -a option:
 #         A   Alias file
 #         B   Bundle
@@ -25,7 +25,7 @@
 #         T   Stationery
 #         V   Invisible*
 #         Z   Busy*
-# 
+#
 #     Note: Items marked with an asterisk (*) are allowed with folders
 #     Note: Period (.) represents the current date and time.
 #     Note: [yy]yy < 100 assumes 21th century, e.g. 20yy
@@ -46,27 +46,32 @@ max_priority () {
 create () {
     cd $1
     set -e
-    
+
     touch type-and-creator
     SetFile -c MSWD -t TEXT type-and-creator
-    
+
     mkdir bundle-dir
     touch bundle-dir/stuff
     SetFile -a B bundle-dir
-    
+
     mkdir invisible-dir
     SetFile -a V invisible-dir
-        
+
     touch hidden-extension.txt
     SetFile -a E hidden-extension.txt
-    
+
     touch system-file
     SetFile -a S system-file
-    
+
     # Use every flag possible (except lock)
     touch mucho-flags-file
     SetFile -a ABCDEIMNSTVZ mucho-flags-file
-    
+
+    # Use every flag possible (then lock it)
+    touch mucho-flags-file-locked
+    SetFile -a ABCDEIMNSTVZ mucho-flags-file-locked
+    chflags uchg mucho-flags-file-locked
+
     # All possible on a dir
     mkdir mucho-flags-dir
     SetFile -a CDEIVZ mucho-flags-dir
@@ -75,23 +80,15 @@ create () {
 compare () {
     test "`GetFileInfo -P -a $1`" = "`GetFileInfo -P -a $2`" \
     && test "`GetFileInfo -P -m $1`" = "`GetFileInfo -P -m $2`"
-    x=$?
-    if [ -f "$1" ]; then
-        test "`GetFileInfo -P -t $1`" = "`GetFileInfo -P -t $2`" \
-        && test "`GetFileInfo -P -c $1`" = "`GetFileInfo -P -c $2`"
-        x2=$?
-    elif [ -d "$1" ]; then
-        x2=0
-    else
-        echo "ERROR: Unknown file type in 40-finder-flags compare test"
-        x2=1
-    fi
-    alltrue $x $x2
+    if [ ! -d $1 ]; then
+	    test "`GetFileInfo -P -t $1`" = "`GetFileInfo -P -t $2`" \
+	    && test "`GetFileInfo -P -c $1`" = "`GetFileInfo -P -c $2`"
+	fi
 }
 
 verify () {
     cd $1
-    
+
     test "`GetFileInfo -t type-and-creator`" = '"TEXT"' \
     && test "`GetFileInfo -c type-and-creator`" = '"MSWD"' \
     && test "`GetFileInfo -ab bundle-dir`" = "1" \
@@ -99,6 +96,7 @@ verify () {
     && test "`GetFileInfo -ae hidden-extension.txt`" = "1" \
     && test "`GetFileInfo -as system-file`" = "1" \
     && compare ./mucho-flags-file $2/mucho-flags-file \
+    && compare ./mucho-flags-file-locked $2/mucho-flags-file-locked \
     && compare ./mucho-flags-dir $2/mucho-flags-dir
 }
 

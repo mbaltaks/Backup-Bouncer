@@ -1,8 +1,8 @@
 #!/bin/bash
 
 declare -a priority_desc
-priority_desc=([$Critical]='(Critical)' \
-    [$Important]='(Important)' \
+priority_desc=([$Critical]='' \
+    [$Important]='' \
     [$Exhaustive]='')
 
 has_subtests=""

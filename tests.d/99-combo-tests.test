@@ -7,22 +7,22 @@ max_priority () {
 create () {
     cd $1
     set -e
-    
+
     touch xattr-with-rfork
     echo "I love pancakes so much" > xattr-with-rfork/rsrc
-    xattr-util w fairy.tale \
+    xattr-util --set fairy.tale \
             "My friend Goldilocks, she does things she shouldn't do" \
             xattr-with-rfork
-    
+
     # Nope, can't do it
     # sudo mknod device-with-acl c 3 3
     # chmod +a "www allow read" device-with-acl
 
     # A big fat test with lots of metadata
     echo "gotta boogie" > many-metadata
-    xattr-util w big.time "so much larger than life" many-metadata
-    xattr-util w big.time2 "so much larger than life" many-metadata
-    xattr-util w big.time3 "so much larger than life" many-metadata
+    xattr-util --set big.time "so much larger than life" many-metadata
+    xattr-util --set big.time2 "so much larger than life" many-metadata
+    xattr-util --set big.time3 "so much larger than life" many-metadata
     echo "Jack-knifed Juggernaut" > many-metadata/..namedfork/rsrc
     chmod 604 many-metadata
     SetFile -a ABCDEIMNSTVZ many-metadata
@@ -32,7 +32,7 @@ create () {
     chflags uappnd,nodump many-metadata
     # Lock the file to make sure the copier doesn't lock it too early
     sudo SetFile -a L many-metadata
-    
+
     # I've been told that Apple's rsync once had a problem with the combination
     # of hardlinks and resource forks.  Let's try it
     # touch hl-rfork1
@@ -46,10 +46,10 @@ create () {
 compare-xattrs () {
     test -e $1 && \
         test -e $2 && \
-        test "`xattr-util l $1`" = "`xattr-util l $2`" \
+        test "`xattr-util --list $1`" = "`xattr-util --list $2`" \
         || return 1
-    for a in `xattr-util l $1`; do
-        test "`xattr-util r $a $1`" = "`xattr-util r $a $2`" || return 1
+    for a in `xattr-util --list $1`; do
+        test "`xattr-util --get $a $1`" = "`xattr-util --get $a $2`" || return 1
     done
 }
 
@@ -87,20 +87,20 @@ compare-inodes () {
 
 verify () {
     cd $1
-    
+
     begin-subtests
-    
+
     test -e ./xattr-with-rfork \
         && compare-xattrs ./xattr-with-rfork $2/xattr-with-rfork \
         && compare-rforks ./xattr-with-rfork $2/xattr-with-rfork
     x1=$?
     subtest "xattrs + rsrc forks" $x1
-    
+
     # test -e ./device-with-acl \
     #     && compare-acls ./device-with-acl $2/device-with-acl
     # x2=$?
     # subtest "device w/ACL" $x2
-    
+
     test -e ./many-metadata \
         && cmp ./many-metadata $2/many-metadata \
         && compare-xattrs ./many-metadata $2/many-metadata \
@@ -111,7 +111,7 @@ verify () {
         && compare-stats ./many-metadata $2/many-metadata
     x3=$?
     subtest "lots of metadata" $x3
-    
+
     # For now, this goes in the resource-forks test so it can be "critical"
     # test -e ./hl-rfork1 \
         # && test -e ./hl-rfork2 \
@@ -120,7 +120,7 @@ verify () {
         # && compare-rforks ./hl-rfork2 $2/hl-rfork2
     # x4=$?
     # subtest "hardlinks + rsrc forks" $x4
-    
+
     alltrue $x1 $x3
 }
 

@@ -19,7 +19,7 @@ release-tag:
 	   && svn ls $$TAGSDIR \
 	   | ( grep -q release-$(VERSION) \
 	       || svn cp . $$TAGSDIR/release-$(VERSION) )
-	
+
 release:
 	echo "Packaging version $(VERSION)"
 	[ -d release ] || mkdir release
@@ -28,7 +28,7 @@ release:
 	                 release/$(NAME)-$(VERSION)
 	cd release \
 	   && tar cvzf $(NAME)-$(VERSION).tgz $(NAME)-$(VERSION)
-	
+
 upload:
 	scp release/$(NAME)-$(VERSION).tgz \
 	   n8gray.org:public_html/files/$(NAME)/

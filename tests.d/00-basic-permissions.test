@@ -11,24 +11,24 @@ max_priority () {
 #   $1: a new directory where you should create your files
 create () {
     cd $1
-    
+
     touch owned-by-me
     chmod 1777 owned-by-me
-    
+
     touch owned-by-root
     sudo chown root:wheel owned-by-root
-    
+
     touch owned-by-www
     sudo chown www:www owned-by-www
-    
+
     mkdir some-dir
     chmod 1777 some-dir
-    
+
 }
 
 # Args:
 #   $1 & $2: Two files.  You should fail if the property of interest differs
-#            between them.  For example, if you are testing permissions, 
+#            between them.  For example, if you are testing permissions,
 #            compare should fail if the files have different permissions.
 #
 # Note: You should NOT assume that this file was produced by your create
@@ -49,7 +49,7 @@ compare () {
 # This should fail if it detects that the copy was not faithful.
 verify () {
     cd $1
-    
+
     compare ./owned-by-me $2/owned-by-me \
     && compare ./owned-by-root $2/owned-by-root \
     && compare ./owned-by-www $2/owned-by-www \
@@ -57,9 +57,9 @@ verify () {
 }
 
 # Args: none
-# Treating the working directory as though your create function had been 
+# Treating the working directory as though your create function had been
 # run there, perform any necessary operations to allow 'sudo rm -rf' to succeed.
 # For example, unlock any locked files.
-clean () { 
-    true 
+clean () {
+    true
 }

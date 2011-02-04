@@ -10,7 +10,7 @@ create () {
     ln ./some-file link1
     ln ./some-file link2
     ln ./link1 link3
-    
+
     # Leopard allows hard links to directories
     # mkdir dir1
     # mkdir dir2
@@ -30,13 +30,13 @@ verify () {
     test "`uniq $tmpfile | wc -l | awk '{print $1}'`" = "1"
     #x1=$?
     #subtest "on files" $x1
-    
+
     # stat -f "%i" dir1 > $tmpfile
     # stat -f "%i" dir2/dir1-link >> $tmpfile
     # test "`uniq $tmpfile | wc -l | awk '{print $1}'`" = "1"
     # x2=$?
     # subtest "on directories" $x2
-    
+
     #rm -f $tmpfile
     #alltrue $x1
 }

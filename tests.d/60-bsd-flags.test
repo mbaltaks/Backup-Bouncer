@@ -14,7 +14,7 @@
 #           sappnd  set the system append-only flag (super-user only)
 #           schg    set the system immutable flag (super-user only)
 #           sunlnk  set the system undeletable flag (super-user only)
-#           
+#
 #           archived, sappend, schange, simmutable, uappend, uchange,
 #                   uimmutable, sunlink, uunlink
 #                   aliases for the above
@@ -34,13 +34,13 @@ max_priority () {
 create () {
     cd $1
     set -e
-    
+
     mkdir dir-with-flags
     chflags uappnd,uchg,nodump,opaque dir-with-flags
-    
+
     touch file-with-flags
     chflags uappnd,uchg,nodump,opaque file-with-flags
-    
+
 }
 
 compare () {

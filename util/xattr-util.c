@@ -25,13 +25,13 @@ int show_xattr(char *file, char *name)
 }
 
 int main(int argc, char *argv[]) {
-    
+
     if (argc < 3) {
-        fprintf(stderr,"Usage: %s [l | a | r attr | w attr val] file\n", 
+        fprintf(stderr,"Usage: %s [l | a | r attr | w attr val] file\n",
                 argv[0]);
         return 1;
     }
-    
+
     int options = XATTR_NOFOLLOW;
     if (argv[1][0] == 'r') {
         /* Read mode */
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
             return 0;
         perror(argv[0]);
         return 1;
-    } 
+    }
     else if (argv[1][0] == 'w') {
         /* Write mode */
         if (argc != 5) {

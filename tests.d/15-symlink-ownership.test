@@ -18,7 +18,7 @@ create () {
 
 # Args:
 #   $1 & $2: Two files.  You should fail if the property of interest differs
-#            between them.  For example, if you are testing permissions, 
+#            between them.  For example, if you are testing permissions,
 #            compare should fail if the files have different permissions.
 #
 # Note: You should NOT assume that this file was produced by your create
@@ -42,13 +42,13 @@ verify () {
     compare ./symlink1 $2/symlink1 \
     && compare ./symlink2 $2/symlink2 \
     && compare ./symlink3 $2/symlink3
-    
+
 }
 
 # Args: none
-# Treating the working directory as though your create function had been 
+# Treating the working directory as though your create function had been
 # run there, perform any necessary operations to allow 'rm -rf' to succeed.
 # For example, unlock any locked files.
-clean () { 
-    true 
+clean () {
+    true
 }
