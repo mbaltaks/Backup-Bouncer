@@ -11,7 +11,7 @@ echo
 
 set -ex
 
-make
+#make
 ./bbouncer create-vol Src
 ./bbouncer create-vol Dst
 ./bbouncer create /Volumes/Src
